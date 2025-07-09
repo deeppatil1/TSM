@@ -1,26 +1,31 @@
 <?php
 
 namespace App\Models;
-use Illuminate\Support\Str;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Support\Str;
+use App\Enums\Role;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    protected static function boot()
-{
-    parent::boot();
+    protected $keyType = 'string';
+    protected $casts = [
+        'role' => Role::class,
+    ];
 
-    static::creating(function ($model) {
-        if (empty($model->{$model->getKeyName()})) {
-            $model->{$model->getKeyName()} = (string) Str::uuid();
-        }
-    });
-}
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->{$model->getKeyName()})) {
+                $model->{$model->getKeyName()} = (string) Str::uuid();
+            }
+        });
+    }
+
     use HasFactory, Notifiable;
 
     /**
@@ -28,7 +33,7 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    protected $fillable = ['id','name', 'email', 'password', 'role', 'created_by'];
+    protected $fillable = ['id', 'name', 'email', 'password', 'role', 'created_by'];
 
 
     /**
@@ -52,5 +57,10 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function clientDetail()
+    {
+        return $this->hasOne(ClientDetail::class);
     }
 }

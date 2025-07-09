@@ -13,17 +13,23 @@ class CheckRole
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, $roles): Response
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        $user = $request->user();
-
-        // Split the comma-separated roles string into an array
-        $rolesArray = explode(',', $roles);
-
-        if (! $user || ! in_array($user->role, $rolesArray)) { // Use the array here
-            abort(403, 'Access denied: insufficient role.');
+        if (empty($roles)) {
+            abort(403, 'No roles specified for access');
         }
 
-        return $next($request);
+        $user = $request->user();
+
+        if (!$user) {
+            abort(401, 'Unauthenticated');
+        }
+
+            if ($user->role !== $role) {
+                abort(403, 'Access denied: insufficient role');
+            }
+                return $next($request);
+        
+
     }
 }

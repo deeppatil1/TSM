@@ -1,110 +1,90 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Repositories\UserRepository;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
-use App\Models\Profile; // Assuming a Profile model exists and User has a profile relationship
 
+use App\Models\User;
+use App\Repositories\UserRepository;
+use App\Http\Requests\UserValidateRequest;
+use Inertia\Inertia;
+use App\Enums\Role;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-
-    protected $userRepository;
-
-    public function __construct(UserRepository $userRepository)
+    public function __construct(public UserRepository $userRepository)
     {
-        $this->userRepository = $userRepository;
-        // Add auth middleware to protect the store method
-        $this->middleware('auth')->only(['index', 'store']);
+        $this->middleware('auth')->only(['index', 'store', 'create', 'edit', 'update', 'destroy']);
     }
 
     public function index()
     {
-        // $users = $this->userRepository->getAllUsers();
-        // return response()->json($users);
-
-         return Inertia::render('Profile/AddUser');
+        try {
+            $users = $this->userRepository->getAll();
+            return Inertia::render('Users/ViewUsers', ['users' => $users]);
+        } catch (\Exception $e) {
+            abort(503);
+        }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        try {
+            return Inertia::render('Users/UserForm', [
+                'type' => 'create',
+                'roles' => array_column(Role::cases(), 'value')
+            ]);
+        } catch (\Exception $e) {
+            abort(503);
+        }
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(UserValidateRequest $request)
     {
-        $user = Auth::user(); // $user is guaranteed to be a valid User model here due to 'auth' middleware
-
-        $validated = $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
-            'role'     => 'required|in:Admin,Client,Employee',
-        ]);
-
-        $newUser = User::create([
-            'id'         => Str::uuid()->toString(),
-            'name'       => $validated['name'],
-            'email'      => $validated['email'],
-            'password'   => Hash::make($validated['password']),
-            'role'       => $validated['role'],
-            'created_by' => $user->id, // Use $user->id directly as $user is authenticated
-        ]);
-
-
-        // Pass the newly created user (potentially with relationships loaded) to the Welcome component
-        // The client-side Welcome component should expect a 'user' prop.
-        return Inertia::render('Welcome', [
-            'user' => $newUser,
-        ]);
+        try {
+            $newUser = $this->userRepository->store($request->validated());
+            return Inertia::render('Users/ViewUsers', ['user' => $newUser]);
+        } catch (\Exception $e) {
+            abort(503);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
+
+    public function update(UserValidateRequest $request, string $id)
+    {
+        try {
+            $this->userRepository->update($id, $request->validated());
+            return redirect()->route('users.index')->with('success', 'User updated successfully.');
+        } catch (\Exception $e) {
+            abort(503);
+        }
+    }
+
     public function show(string $id)
     {
-        //
+        abort(503);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit(User $user)
     {
-        //
+        try {
+            return Inertia::render('Users/UserForm', [
+                'type' => 'edit',
+                'user' => $user,
+                'roles' => array_column(Role::cases(), 'value')
+            ]);
+        } catch (\Exception $e) {
+            abort(503);
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+
     public function destroy(string $id)
     {
-        //
+        try {
+            $this->userRepository->destroy($id);
+            return redirect()->route('users.index')->with('success', 'User deleted successfully.');
+        } catch (\Exception $e) {
+            abort(503);
+        }
     }
 }
-
-
