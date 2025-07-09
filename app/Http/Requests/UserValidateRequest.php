@@ -27,6 +27,7 @@ class UserValidateRequest extends FormRequest
         ],
         'password' => $this->isMethod('post') ? 'required|string|min:6' : 'sometimes',
         ...$this->clientSpecificRules(),
+        'role' => ['required', Rule::in(array_column(Role::cases(), 'value'))],
     ];
 }
 
@@ -57,22 +58,7 @@ protected function clientSpecificRules(): array
             'password.required' => 'The password field is required.',
             'password.min'     => 'The password must be at least 6 characters.',
             'role.required'    => 'The role field is required.',
-            'role.in'          => 'The selected role is invalid. Valid roles are: ' . implode(', ', array_column(Role::cases(), 'value')),
         ];
     }
-    public function getUserValidatedFields(): array
-    {
-        return [
-            'name' => $this->input('name'),
-            'email' => $this->input('email'),
-            'role' => $this->input('role'),
-        ];
-    }
-    public function getClientValidatedFields(): array
-    {
-        return [
-            'company_name' => $this->input('client_company'),
-            'contact_number' => $this->input('company_number'),
-        ];
-    }
+    
 }

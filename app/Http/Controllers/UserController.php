@@ -39,23 +39,17 @@ class UserController extends Controller
     }
     public function store(UserValidateRequest $request)
     {
-        try {
-            $newUser = $this->userRepository->store($request->validated());
-            return Inertia::render('Users/ViewUsers', ['user' => $newUser]);
-        } catch (\Exception $e) {
-            abort(503);
-        }
+        $this->userRepository->AddUser($request->validated());
+
+        return redirect()->route('users.index')->with('success', 'User created successfully.');
     }
 
 
-    public function update(UserValidateRequest $request, string $id)
+     public function update(UserValidateRequest $request, $id)
     {
-        try {
-            $this->userRepository->update($id, $request->validated());
-            return redirect()->route('users.index')->with('success', 'User updated successfully.');
-        } catch (\Exception $e) {
-            abort(503);
-        }
+        $this->userRepository->UpdateUser($id, $request->validated());
+
+        return redirect()->route('users.index')->with('success', 'User updated successfully.');
     }
 
     public function show(string $id)
