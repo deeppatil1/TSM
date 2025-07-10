@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { router } from '@inertiajs/react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'; // Import AuthenticatedLayout
+
 
 const ProjectsTable = ({ projects }) => {
   const [filter, setFilter] = useState('');
@@ -19,6 +21,7 @@ const ProjectsTable = ({ projects }) => {
     );
 
   return (
+  <AuthenticatedLayout>
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="flex justify-between items-center mb-6">
         <button
@@ -73,6 +76,7 @@ const ProjectsTable = ({ projects }) => {
         </table>
       </div>
     </div>
+  </AuthenticatedLayout>
   );
 };
 

@@ -16,10 +16,10 @@ return new class extends Migration
             $table->string('name');
             $table->text('description');
             $table->string('status');
-            $table->foreignUuid('project_id')->constrained('projects')->cascadeOnDelete();
-            $table->foreignUuid('assigned_to')->nullable()->constrained('users')->cascadeOnDelete();
-            $table->foreignUuid('created_by')->constrained('users')->cascadeOnDelete();
-            $table->foreignUuid('updated_by')->constrained('users')->cascadeOnDelete();
+            $table->foreignUuid('project_id')->constrained('projects');
+            $table->foreignUuid('assigned_to')->constrained('users');
+            $table->foreignUuid('created_by')->constrained('users');
+            $table->foreignUuid('updated_by')->constrained('users');
             $table->date('start_date');
             $table->date('end_date');
             $table->timestamps();

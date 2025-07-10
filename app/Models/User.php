@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class User extends Authenticatable
 {
     protected $keyType = 'string';
+    public $incrementing = false; // Add this line
     protected $casts = [
         'role' => Role::class,
     ];

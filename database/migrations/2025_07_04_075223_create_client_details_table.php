@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('client_details', function (Blueprint $table) {
             $table->uuid('id')->primary(); // Primary Key (UUID)
-            $table->foreignUuid('user_id')->constrained('users')->cascadeOnDelete(); 
+            $table->foreignUuid('user_id')->constrained('users'); 
             $table->string('company_name');
             $table->string('contact_number');
             $table->timestamps();

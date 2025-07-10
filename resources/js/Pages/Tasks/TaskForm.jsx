@@ -1,5 +1,7 @@
 import React from 'react';
 import { useForm, usePage } from '@inertiajs/react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'; // Import AuthenticatedLayout
+
 
 export default function TaskForm({ type, task }) {
   const { projects, employees, Status } = usePage().props;
@@ -26,6 +28,7 @@ export default function TaskForm({ type, task }) {
   };
 
   return (
+    <AuthenticatedLayout>
     <div className="max-w-xl mx-auto p-6 bg-white rounded-xl shadow-md mt-10">
       <h1 className="text-2xl font-bold mb-6 text-gray-800">
         {isEdit ? 'Edit Task' : 'Add New Task'}
@@ -155,6 +158,7 @@ export default function TaskForm({ type, task }) {
         </div>
       </form>
     </div>
+    </AuthenticatedLayout>
   );
 }
  

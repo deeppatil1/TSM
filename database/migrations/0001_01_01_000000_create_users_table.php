@@ -12,22 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-        //     $table->uuid('id')->primary();
-        //     $table->string('name');
-        //     $table->string('email')->unique();
-        //     $table->string('password');
-        //     $table->string('role');
-        //     $table->timestamps();
-        //     $table->uuid('created_by')->nullable();
-        //     $table->uuid('updated_by')->nullable();
-
-        //     $table->foreign('created_by')->references('id')->on('users')->nullOnDelete();
-        //     $table->foreign('updated_by')->references('id')->on('users')->nullOnDelete();
-
-
-
-
-
             $table->uuid('id')->primary();
             $table->string('name');
             $table->string('email')->unique();
@@ -69,3 +53,4 @@ return new class extends Migration
         Schema::dropIfExists('sessions');
     }
 };
+          

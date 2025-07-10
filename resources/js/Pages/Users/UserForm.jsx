@@ -1,5 +1,7 @@
 import React from 'react';
 import { useForm, usePage } from '@inertiajs/react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+
 
 export default function UserForm({ type, user }) {
   const { roles } = usePage().props;
@@ -23,13 +25,13 @@ export default function UserForm({ type, user }) {
   const isEdit = type === 'edit';
 
   return (
+    <AuthenticatedLayout>
     <div className="max-w-xl mx-auto p-6 bg-white rounded-xl shadow-md mt-10">
       <h1 className="text-2xl font-bold mb-6 text-gray-800">
         {isEdit ? 'Edit User' : 'Add New User'}
       </h1>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Name Field */}
         <div>
           <label className="block mb-1 font-medium text-gray-700">Name:</label>
           <input
@@ -42,7 +44,6 @@ export default function UserForm({ type, user }) {
           {errors.name && <div className="text-sm text-red-600 mt-1">{errors.name}</div>}
         </div>
 
-        {/* Email Field */}
         <div>
           <label className="block mb-1 font-medium text-gray-700">Email:</label>
           <input
@@ -51,12 +52,10 @@ export default function UserForm({ type, user }) {
             className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:border-blue-400"
             value={data.email}
             onChange={(e) => setData('email', e.target.value)}
-          // Disable email for edits if needed
           />
           {errors.email && <div className="text-sm text-red-600 mt-1">{errors.email}</div>}
         </div>
 
-        {/* Password Field - Only for create */}
         {!isEdit && (
           <div>
             <label className="block mb-1 font-medium text-gray-700">Password:</label>
@@ -72,7 +71,6 @@ export default function UserForm({ type, user }) {
           </div>
         )}
 
-        {/* Role Field */}
         <div>
           <label className="block mb-1 font-medium text-gray-700">Role:</label>
           <select
@@ -88,7 +86,6 @@ export default function UserForm({ type, user }) {
           {errors.role && <div className="text-sm text-red-600 mt-1">{errors.role}</div>}
         </div>
 
-        {/* Client-specific fields */}
         {data.role === 'Client' && (
           <>
             <div>
@@ -132,5 +129,6 @@ export default function UserForm({ type, user }) {
         </div>
       </form>
     </div>
+    </AuthenticatedLayout>
   );
 }

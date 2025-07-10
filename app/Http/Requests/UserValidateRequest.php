@@ -21,7 +21,7 @@ class UserValidateRequest extends FormRequest
     return [
         'name' => 'required|string|max:255',
         'email' => [
-            'required', 
+            'required',
             'email',
             Rule::unique('users', 'email')->ignore($userId)
         ],
@@ -60,5 +60,5 @@ protected function clientSpecificRules(): array
             'role.required'    => 'The role field is required.',
         ];
     }
-    
+
 }

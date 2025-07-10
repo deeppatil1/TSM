@@ -1,5 +1,7 @@
 import React from 'react';
 import { useForm, usePage } from '@inertiajs/react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'; // Import AuthenticatedLayout
+
 
 export default function ProjectForm({ type, project }) {
   const { clients, employees } = usePage().props; 
@@ -23,6 +25,7 @@ export default function ProjectForm({ type, project }) {
   };
 
   return (
+  <AuthenticatedLayout>
     <div className="max-w-xl mx-auto p-6 bg-white rounded-xl shadow-md mt-10">
       <h1 className="text-2xl font-bold mb-6 text-gray-800">
         {isEdit ? 'Edit Project' : 'Add New Project'}
@@ -131,5 +134,6 @@ export default function ProjectForm({ type, project }) {
         </div>
       </form>
     </div>
+  </AuthenticatedLayout>
   );
 }
