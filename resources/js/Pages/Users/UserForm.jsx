@@ -2,7 +2,7 @@ import React from 'react';
 import { useForm, usePage } from '@inertiajs/react';
 
 export default function UserForm({ type, user }) {
-  const { roles } = usePage().props; 
+  const { roles } = usePage().props;
 
   const { data, setData, post, put, processing, errors } = useForm({
     name: user?.name || '',
@@ -51,7 +51,7 @@ export default function UserForm({ type, user }) {
             className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:border-blue-400"
             value={data.email}
             onChange={(e) => setData('email', e.target.value)}
-             // Disable email for edits if needed
+          // Disable email for edits if needed
           />
           {errors.email && <div className="text-sm text-red-600 mt-1">{errors.email}</div>}
         </div>

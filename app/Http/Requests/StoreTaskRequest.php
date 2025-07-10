@@ -3,8 +3,10 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use App\Enums\Status;
 
-class UpdateProjectRequest extends FormRequest
+class StoreTaskRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -16,10 +18,11 @@ class UpdateProjectRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'client_id' => ['required', 'exists:users,id'],
-            'employee_id' => ['required', 'exists:users,id'],
+            'status' => ['nullable', Rule::enum(Status::class)],
+            'project_id' => ['required', 'exists:projects,id'],
+            'assigned_to' => ['required', 'exists:users,id'],
             'start_date' => ['required', 'date'],
-            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+            'end_date' => ['required', 'date', 'after_or_equal:start_date'],
         ];
     }
 }

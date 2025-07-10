@@ -16,6 +16,11 @@ class ProjectRepository extends BaseRepository
     {
         return $this->model->create($data);
     }
+
+    public function updateProject(Project $project, array $data): bool
+    {
+        return $project->update($data);
+    }
 }
 
 

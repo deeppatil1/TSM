@@ -3,20 +3,25 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory; // Assuming tasks will have factories
-use Illuminate\Support\Str; // Assuming tasks will use UUIDs based on migration
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Enums\Status;
 
 class Task extends Model
 {
-    use HasFactory; 
+    use HasFactory;
 
     protected $guarded = ['id'];
 
-    protected $keyType = 'string'; 
-    public $incrementing = false; 
+    protected $keyType = 'string';
+    public $incrementing = false;
 
-    protected static function boot() 
+    protected $casts = [
+        'status' => Status::class,
+    ];
+
+    protected static function boot()
     {
         parent::boot();
 
@@ -47,3 +52,4 @@ class Task extends Model
         return $this->belongsTo(User::class, 'updated_by');
     }
 }
+
