@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useForm, usePage } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'; // Import AuthenticatedLayout
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import InputLabel from '@/Components/InputLabel';
+import TextInput from '@/Components/TextInput';
+import PrimaryButton from '@/Components/PrimaryButton';
 
 
 export default function TaskForm({ type, task }) {
-  const { projects, employees, Status } = usePage().props;
+  const { projects, allEmployees, Status } = usePage().props;
 
   const { data, setData, post, put, processing, errors } = useForm({
     name: task?.name || '',
@@ -27,6 +30,37 @@ export default function TaskForm({ type, task }) {
     }
   };
 
+  const availableEmployees = useMemo(() => {
+    if (!data.project_id) {
+       if (isEdit && task?.assigned_to) {
+           const assignedEmployee = allEmployees.find(emp => emp.id === task.assigned_to);
+           return assignedEmployee ? [assignedEmployee] : [];
+       }
+      return [];
+    }
+
+    const selectedProject = projects.find(p => p.id === data.project_id);
+
+    if (!selectedProject || !selectedProject.employees) {
+      return [];
+    }
+
+    const assignedEmployeeIds = selectedProject.employees.map(emp => emp.id);
+
+    const filtered = allEmployees.filter(employee => assignedEmployeeIds.includes(employee.id));
+
+     if (isEdit && task?.assigned_to && !filtered.some(emp => emp.id === task.assigned_to)) {
+         const assignedEmployee = allEmployees.find(emp => emp.id === task.assigned_to);
+         if (assignedEmployee) {
+             return [...filtered, assignedEmployee];
+         }
+     }
+
+
+    return filtered;
+  }, [data.project_id, projects, allEmployees, isEdit, task?.assigned_to]);
+
+
   return (
     <AuthenticatedLayout>
     <div className="max-w-xl mx-auto p-6 bg-white rounded-xl shadow-md mt-10">
@@ -37,26 +71,26 @@ export default function TaskForm({ type, task }) {
       <form onSubmit={handleSubmit} className="space-y-5">
 
         <div>
-          <label className="block mb-1 font-medium text-gray-700" htmlFor="name">Name:</label>
-          <input
+          <InputLabel htmlFor="name" value="Name:" />
+          <TextInput
             id="name"
             type="text"
             name="name"
             value={data.name}
+            className="mt-1 block w-full"
             onChange={(e) => setData('name', e.target.value)}
-            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:border-blue-400"
           />
           {errors.name && <div className="text-sm text-red-600 mt-1">{errors.name}</div>}
         </div>
 
         <div>
-          <label className="block mb-1 font-medium text-gray-700" htmlFor="description">Description:</label>
+          <InputLabel htmlFor="description" value="Description:" />
           <textarea
             id="description"
             name="description"
             value={data.description}
             onChange={(e) => setData('description', e.target.value)}
-            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:border-blue-400"
+            className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:border-blue-400"
             rows="4"
           />
           {errors.description && <div className="text-sm text-red-600 mt-1">{errors.description}</div>}
@@ -64,13 +98,13 @@ export default function TaskForm({ type, task }) {
 
         {isEdit && (
           <div>
-            <label className="block mb-1 font-medium text-gray-700" htmlFor="status">Status:</label>
+            <InputLabel htmlFor="status" value="Status:" />
             <select
               id="status"
               name="status"
               value={data.status}
               onChange={(e) => setData('status', e.target.value)}
-              className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:border-blue-400"
+              className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:border-blue-400"
             >
               <option value="">Select Status</option>
               {Status && Status.map((statusOption) => (
@@ -83,83 +117,88 @@ export default function TaskForm({ type, task }) {
           </div>
         )}
 
-        <div>
-          <label className="block mb-1 font-medium text-gray-700" htmlFor="project_id">Project:</label>
-          <select
-            id="project_id"
-            name="project_id"
-            value={data.project_id}
-            onChange={(e) => setData('project_id', e.target.value)}
-            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:border-blue-400"
-          >
-            <option value="">Select Project</option>
-            {projects && projects.map((projectOption) => (
-              <option key={projectOption.id} value={projectOption.id}>
-                {projectOption.name}
-              </option>
-            ))}
-          </select>
-          {errors.project_id && <div className="text-sm text-red-600 mt-1">{errors.project_id}</div>}
-        </div>
+        {!isEdit && (
+          <div>
+            <InputLabel htmlFor="project_id" value="Project:" />
+            <select
+              id="project_id"
+              name="project_id"
+              value={data.project_id}
+              onChange={(e) => {
+                  setData('project_id', e.target.value);
+                  setData('assigned_to', '');
+              }}
+              className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:border-blue-400"
+            >
+              <option value="">Select Project</option>
+              {projects && projects.map((projectOption) => (
+                <option key={projectOption.id} value={projectOption.id}>
+                  {projectOption.name}
+                </option>
+              ))}
+            </select>
+            {errors.project_id && <div className="text-sm text-red-600 mt-1">{errors.project_id}</div>}
+          </div>
+        )}
+
 
         <div>
-          <label className="block mb-1 font-medium text-gray-700" htmlFor="assigned_to">Assigned Employee:</label>
+          <InputLabel htmlFor="assigned_to" value="Assigned Employee:" />
           <select
             id="assigned_to"
             name="assigned_to"
             value={data.assigned_to}
             onChange={(e) => setData('assigned_to', e.target.value)}
-            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:border-blue-400"
+            className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:border-blue-400"
+            disabled={!data.project_id || availableEmployees.length === 0}
           >
             <option value="">Select Employee</option>
-            {employees && employees.map((employeeOption) => (
+            {availableEmployees.map((employeeOption) => (
               <option key={employeeOption.id} value={employeeOption.id}>
                 {employeeOption.name}
               </option>
             ))}
           </select>
+           {!data.project_id && <div className="text-sm text-gray-500 mt-1">Select a project to see available employees.</div>}
+           {data.project_id && availableEmployees.length === 0 && <div className="text-sm text-gray-500 mt-1">No employees assigned to this project.</div>}
           {errors.assigned_to && <div className="text-sm text-red-600 mt-1">{errors.assigned_to}</div>}
         </div>
 
         <div>
-          <label className="block mb-1 font-medium text-gray-700" htmlFor="start_date">Start Date:</label>
-          <input
+          <InputLabel htmlFor="start_date" value="Start Date:" />
+          <TextInput
             id="start_date"
             type="date"
             name="start_date"
             value={data.start_date}
+            className="mt-1 block w-full"
             onChange={(e) => setData('start_date', e.target.value)}
-            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:border-blue-400"
           />
           {errors.start_date && <div className="text-sm text-red-600 mt-1">{errors.start_date}</div>}
         </div>
 
         <div>
-          <label className="block mb-1 font-medium text-gray-700" htmlFor="end_date">End Date:</label>
-          <input
+          <InputLabel htmlFor="end_date" value="End Date:" />
+          <TextInput
             id="end_date"
             type="date"
             name="end_date"
             value={data.end_date}
+            className="mt-1 block w-full"
             onChange={(e) => setData('end_date', e.target.value)}
-            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:border-blue-400"
           />
           {errors.end_date && <div className="text-sm text-red-600 mt-1">{errors.end_date}</div>}
         </div>
 
         <div>
-          <button
-            type="submit"
-            disabled={processing}
-            className="w-full bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-          >
+          <PrimaryButton disabled={processing}>
             {processing ? 'Processing...' : isEdit ? 'Update Task' : 'Create Task'}
-          </button>
+          </PrimaryButton>
         </div>
       </form>
     </div>
     </AuthenticatedLayout>
   );
 }
- 
+
 

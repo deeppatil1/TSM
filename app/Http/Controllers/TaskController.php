@@ -33,14 +33,15 @@ class TaskController extends Controller
 
     public function create()
     {
-
-        $projects = Project::get(['id', 'name']);
-        $employees = User::where('role', Role::EMPLOYEE)->get(['id', 'name']);
+       
+        $projects = Project::with('employees:id,name')->get(['id', 'name']);
+        
+        $allEmployees = User::where('role', Role::EMPLOYEE)->get(['id', 'name']);
 
         return Inertia::render('Tasks/TaskForm', [
             'type' => 'create',
             'projects' => $projects,
-            'employees' => $employees,
+            'allEmployees' => $allEmployees, 
             'Status' => array_column(Status::cases(), 'value')
         ]);
     }
@@ -48,7 +49,6 @@ class TaskController extends Controller
 
     public function store(StoreTaskRequest $request)
     {
-
         $validatedData = $request->validated();
         $validatedData['created_by'] = Auth::id();
         $validatedData['updated_by'] = Auth::id();
@@ -72,14 +72,14 @@ class TaskController extends Controller
             return redirect()->route('tasks.index')->with('error', 'Task not found.');
         }
 
-        $projects = Project::get(['id', 'name']);
-        $employees = User::where('role', Role::EMPLOYEE)->get(['id', 'name']);
+        $projects = Project::with('employees:id,name')->get(['id', 'name']);
+        $allEmployees = User::where('role', Role::EMPLOYEE)->get(['id', 'name']);
 
         return Inertia::render('Tasks/TaskForm', [
             'type' => 'edit',
             'task' => $task,
             'projects' => $projects,
-            'employees' => $employees,
+            'allEmployees' => $allEmployees, // Pass all employees
             'Status' => array_column(Status::cases(), 'value')
         ]);
     }
