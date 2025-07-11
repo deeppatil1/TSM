@@ -1,9 +1,14 @@
 import React from 'react';
-import { useForm, usePage } from '@inertiajs/react';
+import { useForm, usePage, Head } from '@inertiajs/react'; 
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 
+import InputLabel from '@/Components/InputLabel';
+import TextInput from '@/Components/TextInput'; 
+import InputError from '@/Components/InputError';
+import PrimaryButton from '@/Components/PrimaryButton';
 
-export default function UserForm({ type, user }) {
+
+export default function UserForm({ type, user, auth }) {
   const { roles } = usePage().props;
 
   const { data, setData, post, put, processing, errors } = useForm({
@@ -25,7 +30,8 @@ export default function UserForm({ type, user }) {
   const isEdit = type === 'edit';
 
   return (
-    <AuthenticatedLayout>
+    <AuthenticatedLayout auth={auth}> {/* Pass auth prop to layout */}
+    <Head title={isEdit ? 'Edit User' : 'Create User'} /> {/* Add Head component */}
     <div className="max-w-xl mx-auto p-6 bg-white rounded-xl shadow-md mt-10">
       <h1 className="text-2xl font-bold mb-6 text-gray-800">
         {isEdit ? 'Edit User' : 'Add New User'}
@@ -33,47 +39,65 @@ export default function UserForm({ type, user }) {
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label className="block mb-1 font-medium text-gray-700">Name:</label>
-          <input
+          
+          <InputLabel htmlFor="name" value="Name:" />
+         
+          <TextInput
+            id="name"
             type="text"
             name="name"
-            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:border-blue-400"
+            className="mt-1 block w-full"
             value={data.name}
             onChange={(e) => setData('name', e.target.value)}
+            required
+            isFocused
           />
-          {errors.name && <div className="text-sm text-red-600 mt-1">{errors.name}</div>}
+          
+          <InputError message={errors.name} className="mt-2" />
         </div>
 
         <div>
-          <label className="block mb-1 font-medium text-gray-700">Email:</label>
-          <input
+          
+          <InputLabel htmlFor="email" value="Email:" />
+         
+          <TextInput
+            id="email"
             type="email"
             name="email"
-            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:border-blue-400"
+            className="mt-1 block w-full"
             value={data.email}
             onChange={(e) => setData('email', e.target.value)}
+            //disabled={isEdit} 
+            required
           />
-          {errors.email && <div className="text-sm text-red-600 mt-1">{errors.email}</div>}
+          
+          <InputError message={errors.email} className="mt-2" />
         </div>
 
         {!isEdit && (
           <div>
-            <label className="block mb-1 font-medium text-gray-700">Password:</label>
-            <input
+            
+            <InputLabel htmlFor="password" value="Password:" />
+            
+            <TextInput
+              id="password"
               type="password"
               name="password"
-              className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:border-blue-400"
+              className="mt-1 block w-full"
               value={data.password}
               onChange={(e) => setData('password', e.target.value)}
               required={!isEdit}
             />
-            {errors.password && <div className="text-sm text-red-600 mt-1">{errors.password}</div>}
+            
+            <InputError message={errors.password} className="mt-2" />
           </div>
         )}
 
         <div>
-          <label className="block mb-1 font-medium text-gray-700">Role:</label>
+          
+          <InputLabel htmlFor="role" value="Role:" />
           <select
+            id="role"
             name="role"
             className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:border-blue-400"
             value={data.role}
@@ -83,52 +107,55 @@ export default function UserForm({ type, user }) {
               <option key={role} value={role}>{role}</option>
             ))}
           </select>
-          {errors.role && <div className="text-sm text-red-600 mt-1">{errors.role}</div>}
+         
+          <InputError message={errors.role} className="mt-2" />
         </div>
 
         {data.role === 'Client' && (
           <>
             <div>
-              <label className="block mb-1 font-medium text-gray-700">Client Company:</label>
-              <input
+              
+              <InputLabel htmlFor="client_company" value="Client Company:" />
+             
+              <TextInput
+                id="client_company"
                 type="text"
                 name="client_company"
-                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:border-blue-400"
+                className="mt-1 block w-full"
                 value={data.client_company}
                 onChange={(e) => setData('client_company', e.target.value)}
               />
-              {errors.client_company && (
-                <div className="text-sm text-red-600 mt-1">{errors.client_company}</div>
-              )}
+              
+              <InputError message={errors.client_company} className="mt-2" />
             </div>
 
             <div>
-              <label className="block mb-1 font-medium text-gray-700">Company Number:</label>
-              <input
+              
+              <InputLabel htmlFor="company_number" value="Company Number:" />
+              
+              <TextInput
+                id="company_number"
                 type="text"
                 name="company_number"
-                className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring focus:border-blue-400"
+                className="mt-1 block w-full"
                 value={data.company_number}
                 onChange={(e) => setData('company_number', e.target.value)}
               />
-              {errors.company_number && (
-                <div className="text-sm text-red-600 mt-1">{errors.company_number}</div>
-              )}
+              
+              <InputError message={errors.company_number} className="mt-2" />
             </div>
           </>
         )}
 
-        <div>
-          <button
-            type="submit"
-            disabled={processing}
-            className="w-full bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition"
-          >
-            {processing ? 'Processing...' : (isEdit ? 'Update User' : 'Create User')}
-          </button>
+        <div className="flex items-center justify-end mt-4">
+          
+          <PrimaryButton disabled={processing}>
+            {isEdit ? 'Update User' : 'Create User'}
+          </PrimaryButton>
         </div>
       </form>
     </div>
     </AuthenticatedLayout>
   );
 }
+

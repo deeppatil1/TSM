@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { router } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'; // Import AuthenticatedLayout
+import { Head } from '@inertiajs/react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import PrimaryButton from '@/Components/PrimaryButton'; // Import PrimaryButton
+import SecondaryButton from '@/Components/SecondaryButton'; // Import SecondaryButton
+import DangerButton from '@/Components/DangerButton'; // Import DangerButton
 
 
 const UsersTable = ({ users }) => {
@@ -46,14 +50,13 @@ const UsersTable = ({ users }) => {
 
   return (
   <AuthenticatedLayout>
+    <Head title="User" />
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="flex justify-between items-center mb-6">
-        <button
-          className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200"
-          onClick={() => router.visit('/users/create')}
-        >
+        {/* Use PrimaryButton for Add User */}
+        <PrimaryButton onClick={() => router.visit('/users/create')}>
           Add User
-        </button>
+        </PrimaryButton>
       </div>
 
       <div className="overflow-x-auto bg-white rounded-lg shadow">
@@ -109,22 +112,20 @@ const UsersTable = ({ users }) => {
                   {formatDate(user.created_at)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm space-x-2">
-                  <button
-                    onClick={() => router.visit(`/users/${user.id}/edit`)}
-                    className="inline-flex items-center px-3 py-1 text-sm font-medium text-blue-600 bg-blue-100 rounded hover:bg-blue-200 transition"
-                  >
+                  {/* Use SecondaryButton for Edit */}
+                  <SecondaryButton onClick={() => router.visit(`/users/${user.id}/edit`)}>
                     Edit
-                  </button>
-                  <button
+                  </SecondaryButton>
+                  {/* Use DangerButton for Delete */}
+                  <DangerButton
                     onClick={() => {
                       if (confirm('Are you sure you want to delete this user?')) {
                         router.delete(`/users/${user.id}`);
                       }
                     }}
-                    className="inline-flex items-center px-3 py-1 text-sm font-medium text-red-600 bg-red-100 rounded hover:bg-red-200 transition"
                   >
                     Delete
-                  </button>
+                  </DangerButton>
                 </td>
               </tr>
             ))}
@@ -137,3 +138,4 @@ const UsersTable = ({ users }) => {
 };
 
 export default UsersTable;
+
